@@ -30,6 +30,9 @@ type OAuthStatus = {
   state: 'platform_setup';
 } // Show platform setup info (Bedrock/Vertex/Foundry)
 | {
+  state: 'openrouter_setup';
+} // Show OpenRouter setup instructions
+| {
   state: 'ready_to_start';
 } // Flow started, waiting for browser to open
 | {
@@ -127,6 +130,16 @@ export function ConsoleOAuthFlow({
   }, {
     context: 'Confirmation',
     isActive: oauthStatus.state === 'platform_setup'
+  });
+
+  // Handle Enter to go back from OpenRouter setup
+  useKeybinding('confirm:yes', () => {
+    setOAuthStatus({
+      state: 'idle'
+    });
+  }, {
+    context: 'Confirmation',
+    isActive: oauthStatus.state === 'openrouter_setup'
   });
 
   // Handle Enter to retry on error state
@@ -405,6 +418,9 @@ function OAuthStatusMessage(t0) {
           t6 = [t4, t5, {
             label: <Text>3rd-party platform ·{" "}<Text dimColor={true}>Amazon Bedrock, Microsoft Foundry, or Vertex AI</Text>{"\n"}</Text>,
             value: "platform"
+          }, {
+            label: <Text>OpenRouter ·{" "}<Text dimColor={true}>Access any model via openrouter.ai (requires OPENROUTER_API_KEY)</Text>{"\n"}</Text>,
+            value: "openrouter"
           }];
           $[5] = t6;
         } else {
@@ -417,6 +433,11 @@ function OAuthStatusMessage(t0) {
                 logEvent("tengu_oauth_platform_selected", {});
                 setOAuthStatus({
                   state: "platform_setup"
+                });
+              } else if (value_0 === "openrouter") {
+                logEvent("tengu_oauth_platform_selected", {});
+                setOAuthStatus({
+                  state: "openrouter_setup"
                 });
               } else {
                 setOAuthStatus({
@@ -505,6 +526,41 @@ function OAuthStatusMessage(t0) {
         }
         return t8;
       }
+    case "openrouter_setup":
+      return <Box flexDirection="column" gap={1} marginTop={1}>
+          <Text bold={true}>Using OpenRouter</Text>
+          <Box flexDirection="column" gap={1}>
+            <Text>
+              OpenRouter lets you access Claude and other models through a single
+              API. Set the required environment variable, then restart Claude Code.
+            </Text>
+            <Box flexDirection="column" marginTop={1}>
+              <Text bold={true}>Required setup:</Text>
+              <Text>
+                1. Get your API key at{' '}
+                <Link url="https://openrouter.ai/keys">https://openrouter.ai/keys</Link>
+              </Text>
+              <Text>2. Set environment variables:</Text>
+              <Box flexDirection="column" marginLeft={3}>
+                <Text dimColor={true}>export CLAUDE_CODE_USE_OPENROUTER=1</Text>
+                <Text dimColor={true}>export OPENROUTER_API_KEY=sk-or-v1-...</Text>
+              </Box>
+              <Text>3. Restart Claude Code</Text>
+            </Box>
+            <Box flexDirection="column" marginTop={1}>
+              <Text bold={true}>Optional (for OpenRouter attribution):</Text>
+              <Box flexDirection="column" marginLeft={3}>
+                <Text dimColor={true}>export OPENROUTER_REFERER=https://your-site.com</Text>
+                <Text dimColor={true}>export OPENROUTER_TITLE=&quot;Your App Name&quot;</Text>
+              </Box>
+            </Box>
+            <Box marginTop={1}>
+              <Text dimColor={true}>
+                Press <Text bold={true}>Enter</Text> to go back to login options.
+              </Text>
+            </Box>
+          </Box>
+        </Box>;
     case "waiting_for_login":
       {
         let t1;

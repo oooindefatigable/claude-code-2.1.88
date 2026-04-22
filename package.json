@@ -25,6 +25,7 @@
     "@anthropic-ai/vertex-sdk": "^0.16.0",
     "@azure/identity": "^4.13.1",
     "google-auth-library": "^10.6.2",
+    "react": "^19.2.5",
     "src": "^1.1.2"
   },
   "optionalDependencies": {

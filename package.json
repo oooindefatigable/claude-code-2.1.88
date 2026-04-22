@@ -18,7 +18,15 @@
   "scripts": {
     "prepare": "node -e \"if (!process.env.AUTHORIZED) { console.error('ERROR: Direct publishing is not allowed.\\nPlease see the release workflow documentation to publish this package.'); process.exit(1); }\""
   },
-  "dependencies": {},
+  "dependencies": {
+    "@anthropic-ai/bedrock-sdk": "^0.28.1",
+    "@anthropic-ai/foundry-sdk": "^0.2.3",
+    "@anthropic-ai/sdk": "^0.90.0",
+    "@anthropic-ai/vertex-sdk": "^0.16.0",
+    "@azure/identity": "^4.13.1",
+    "google-auth-library": "^10.6.2",
+    "src": "^1.1.2"
+  },
   "optionalDependencies": {
     "@img/sharp-darwin-arm64": "^0.34.2",
     "@img/sharp-darwin-x64": "^0.34.2",

@@ -218,6 +218,39 @@ export async function getAnthropicClient({
     // we have always been lying about the return type - this doesn't support batching or models
     return new AnthropicFoundry(foundryArgs) as unknown as Anthropic
   }
+  if (isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENROUTER)) {
+    // OpenRouter uses the standard Anthropic SDK with custom base URL and headers
+    // See: https://openrouter.ai/docs/guides/community/anthropic-agent-sdk
+    const openRouterApiKey = process.env.OPENROUTER_API_KEY
+    if (!openRouterApiKey) {
+      throw new Error(
+        'OPENROUTER_API_KEY environment variable is required when using OpenRouter. ' +
+          'Get your API key at https://openrouter.ai/keys',
+      )
+    }
+
+    const openRouterArgs: ConstructorParameters<typeof Anthropic>[0] = {
+      ...ARGS,
+      baseURL: 'https://openrouter.ai/api',
+      apiKey: '', // Must be empty for OpenRouter - auth is via Authorization header
+      defaultHeaders: {
+        ...defaultHeaders,
+        Authorization: `Bearer ${openRouterApiKey}`,
+        // OpenRouter-specific headers for app attribution and ranking
+        'HTTP-Referer':
+          process.env.OPENROUTER_REFERER ||
+          'https://github.com/anthropics/claude-code',
+        'X-Title': process.env.OPENROUTER_TITLE || 'Claude Code CLI',
+      },
+      ...(isDebugToStdErr() && { logger: createStderrLogger() }),
+    }
+
+    logForDebugging(
+      '[API:openrouter] Creating OpenRouter client with base URL: https://openrouter.ai/api',
+    )
+
+    return new Anthropic(openRouterArgs)
+  }
   if (isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)) {
     // Refresh GCP credentials if gcpAuthRefresh is configured and credentials are expired
     // This is similar to how we handle AWS credential refresh for Bedrock

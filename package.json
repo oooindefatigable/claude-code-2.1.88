@@ -24,8 +24,11 @@
     "@anthropic-ai/sdk": "^0.90.0",
     "@anthropic-ai/vertex-sdk": "^0.16.0",
     "@azure/identity": "^4.13.1",
+    "@jridgewell/source-map": "^0.3.11",
+    "esbuild": "^0.28.0",
     "google-auth-library": "^10.6.2",
     "react": "^19.2.5",
+    "source-map": "^0.7.6",
     "src": "^1.1.2"
   },
   "optionalDependencies": {

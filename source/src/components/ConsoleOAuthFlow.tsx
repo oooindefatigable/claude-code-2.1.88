@@ -377,7 +377,7 @@ function OAuthStatusMessage(t0) {
   switch (oauthStatus.state) {
     case "idle":
       {
-        const t1 = startingMessage ? startingMessage : "Claude Code can be used with your Claude subscription or billed based on API usage through your Console account.";
+        const t1 = startingMessage ? startingMessage : "Claude Code is configured to use OpenRouter for API access.";
         let t2;
         if ($[0] !== t1) {
           t2 = <Text bold={true}>{t1}</Text>;
@@ -388,38 +388,15 @@ function OAuthStatusMessage(t0) {
         }
         let t3;
         if ($[2] === Symbol.for("react.memo_cache_sentinel")) {
-          t3 = <Text>Select login method:</Text>;
+          t3 = <Text>Proceed with OpenRouter setup:</Text>;
           $[2] = t3;
         } else {
           t3 = $[2];
         }
-        let t4;
-        if ($[3] === Symbol.for("react.memo_cache_sentinel")) {
-          t4 = {
-            label: <Text>Claude account with subscription ·{" "}<Text dimColor={true}>Pro, Max, Team, or Enterprise</Text>{false && <Text>{"\n"}<Text color="warning">[ANT-ONLY]</Text>{" "}<Text dimColor={true}>Please use this option unless you need to login to a special org for accessing sensitive data (e.g. customer data, HIPI data) with the Console option</Text></Text>}{"\n"}</Text>,
-            value: "claudeai"
-          };
-          $[3] = t4;
-        } else {
-          t4 = $[3];
-        }
-        let t5;
-        if ($[4] === Symbol.for("react.memo_cache_sentinel")) {
-          t5 = {
-            label: <Text>Anthropic Console account ·{" "}<Text dimColor={true}>API usage billing</Text>{"\n"}</Text>,
-            value: "console"
-          };
-          $[4] = t5;
-        } else {
-          t5 = $[4];
-        }
         let t6;
         if ($[5] === Symbol.for("react.memo_cache_sentinel")) {
-          t6 = [t4, t5, {
-            label: <Text>3rd-party platform ·{" "}<Text dimColor={true}>Amazon Bedrock, Microsoft Foundry, or Vertex AI</Text>{"\n"}</Text>,
-            value: "platform"
-          }, {
-            label: <Text>OpenRouter ·{" "}<Text dimColor={true}>Access any model via openrouter.ai (requires OPENROUTER_API_KEY)</Text>{"\n"}</Text>,
+          t6 = [{
+            label: <Text>OpenRouter ·{" "}<Text dimColor={true}>Access Claude via openrouter.ai</Text>{"\n"}</Text>,
             value: "openrouter"
           }];
           $[5] = t6;
@@ -429,27 +406,11 @@ function OAuthStatusMessage(t0) {
         let t7;
         if ($[6] !== setLoginWithClaudeAi || $[7] !== setOAuthStatus) {
           t7 = <Box><Select options={t6} onChange={value_0 => {
-              if (value_0 === "platform") {
-                logEvent("tengu_oauth_platform_selected", {});
-                setOAuthStatus({
-                  state: "platform_setup"
-                });
-              } else if (value_0 === "openrouter") {
-                logEvent("tengu_oauth_platform_selected", {});
+              if (value_0 === "openrouter") {
+                logEvent("tengu_oauth_openrouter_selected", {});
                 setOAuthStatus({
                   state: "openrouter_setup"
                 });
-              } else {
-                setOAuthStatus({
-                  state: "ready_to_start"
-                });
-                if (value_0 === "claudeai") {
-                  logEvent("tengu_oauth_claudeai_selected", {});
-                  setLoginWithClaudeAi(true);
-                } else {
-                  logEvent("tengu_oauth_console_selected", {});
-                  setLoginWithClaudeAi(false);
-                }
               }
             }} /></Box>;
           $[6] = setLoginWithClaudeAi;

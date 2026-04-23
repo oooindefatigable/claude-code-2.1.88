@@ -39,6 +39,52 @@ npm install -g @anthropic-ai/claude-code@2.1.88
 ln -s "$(pwd)/cli.js" /usr/local/bin/claude
 ```
 
+## OpenRouter support
+
+This fork adds OpenRouter provider support to the extracted Claude Code bundle and source tree.
+
+### Required environment variables
+
+```sh
+export CLAUDE_CODE_USE_OPENROUTER=1
+export OPENROUTER_API_KEY="your-o...-key"
+```
+
+Optional routing and attribution settings:
+
+```sh
+export OPENROUTER_REFERER="https://your-site.example"
+export OPENROUTER_TITLE="Your App Name"
+```
+
+Advanced only:
+
+```sh
+export OPENROUTER_BASE_URL="https://openrouter.ai/api"
+```
+
+Only override `OPENROUTER_BASE_URL` if you intentionally want to target a compatible OpenRouter endpoint you trust. The default OpenRouter API URL is used automatically.
+
+### Default model behavior
+
+The CLI still supports the built-in Anthropic model aliases for OpenRouter.
+If you want to force a specific OpenRouter model, set `ANTHROPIC_MODEL` explicitly:
+
+```sh
+export ANTHROPIC_MODEL="nvidia/nemotron-3-super-120b-a12b:free"
+node cli.js
+```
+
+### Smoke test
+
+A non-interactive smoke test is included to verify provider detection:
+
+```sh
+node tests/openrouter-auth-status.mjs
+```
+
+That test checks that `claude auth status --json` reports OpenRouter as a third-party provider when `CLAUDE_CODE_USE_OPENROUTER=1` is set. It does **not** perform a live inference request.
+
 ## Rebuilding from source
 
 Rebuilding from the extracted source is **not feasible** because:

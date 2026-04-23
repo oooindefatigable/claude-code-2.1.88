@@ -114,6 +114,7 @@ export async function getAnthropicClient({
     // SDK consumers can identify their app/library for backend analytics
     ...(clientApp ? { 'x-client-app': clientApp } : {}),
   }
+  const usingOpenRouter = isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENROUTER)
 
   // Log API client configuration for HFI debugging
   logForDebugging(
@@ -132,7 +133,7 @@ export async function getAnthropicClient({
   await checkAndRefreshOAuthTokenIfNeeded()
   logForDebugging('[API:auth] OAuth token check complete')
 
-  if (!isClaudeAISubscriber()) {
+  if (!isClaudeAISubscriber() && !usingOpenRouter) {
     await configureApiKeyHeaders(defaultHeaders, getIsNonInteractiveSession())
   }
 
@@ -231,16 +232,17 @@ export async function getAnthropicClient({
 
     const openRouterArgs: ConstructorParameters<typeof Anthropic>[0] = {
       ...ARGS,
-      baseURL: 'https://openrouter.ai/api',
-      apiKey: '', // Must be empty for OpenRouter - auth is via Authorization header
+      baseURL: process.env.OPENROUTER_BASE_URL || 'https://openrouter.ai/api',
+      apiKey: '', // Must be explicitly empty for OpenRouter Anthropic compatibility
+      authToken: openRouterApiKey,
       defaultHeaders: {
         ...defaultHeaders,
-        Authorization: `Bearer ${openRouterApiKey}`,
-        // OpenRouter-specific headers for app attribution and ranking
-        'HTTP-Referer':
-          process.env.OPENROUTER_REFERER ||
-          'https://github.com/anthropics/claude-code',
-        'X-Title': process.env.OPENROUTER_TITLE || 'Claude Code CLI',
+        ...(process.env.OPENROUTER_REFERER
+          ? { 'HTTP-Referer': process.env.OPENROUTER_REFERER }
+          : {}),
+        ...(process.env.OPENROUTER_TITLE
+          ? { 'X-Title': process.env.OPENROUTER_TITLE }
+          : {}),
       },
       ...(isDebugToStdErr() && { logger: createStderrLogger() }),
     }

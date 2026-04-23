@@ -240,8 +240,12 @@ export async function authStatus(opts: {
   const oauthAccount = getOauthAccountInfo()
   const subscriptionType = getSubscriptionType()
   const using3P = isUsing3PServices()
-  const loggedIn =
-    hasToken || apiKeySource !== 'none' || hasApiKeyEnvVar || using3P
+  const usingOpenRouter = isEnvTruthy(process.env.CLAUDE_CODE_USE_OPENROUTER)
+  const hasOpenRouterKey = !!process.env.OPENROUTER_API_KEY
+  const openRouterReady = usingOpenRouter && hasOpenRouterKey
+  const loggedIn = usingOpenRouter
+    ? openRouterReady
+    : hasToken || apiKeySource !== 'none' || hasApiKeyEnvVar || using3P
 
   // Determine auth method
   let authMethod: string = 'none'
@@ -293,11 +297,13 @@ export async function authStatus(opts: {
   } else {
     const apiProvider = getAPIProvider()
     const resolvedApiKeySource =
-      apiKeySource !== 'none'
-        ? apiKeySource
-        : hasApiKeyEnvVar
-          ? 'ANTHROPIC_API_KEY'
-          : null
+      usingOpenRouter
+        ? null
+        : apiKeySource !== 'none'
+          ? apiKeySource
+          : hasApiKeyEnvVar
+            ? 'ANTHROPIC_API_KEY'
+            : null
     const output: Record<string, string | boolean | null> = {
       loggedIn,
       authMethod,
